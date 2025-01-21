@@ -6,57 +6,56 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 typedef enum
 {
-    GRASS,
-    FIRE,
-    WATER,
-    BUG,
-    NORMAL,
-    POISON,
-    ELECTRIC,
-    GROUND,
-    FAIRY,
-    FIGHTING,
-    PSYCHIC,
-    ROCK,
-    GHOST,
-    DRAGON,
-    ICE
+   GRASS,
+   FIRE,
+   WATER,
+   BUG,
+   NORMAL,
+   POISON,
+   ELECTRIC,
+   GROUND,
+   FAIRY,
+   FIGHTING,
+   PSYCHIC,
+   ROCK,
+   GHOST,
+   DRAGON,
+   ICE
 } PokemonType;
 
 typedef enum
 {
-    CANNOT_EVOLVE,
-    CAN_EVOLVE
+   CANNOT_EVOLVE,
+   CAN_EVOLVE
 } EvolutionStatus;
 
 typedef struct PokemonData
 {
-    int id;
-    char *name;
-    PokemonType TYPE;
-    int hp;
-    int attack;
-    EvolutionStatus CAN_EVOLVE;
+   int id;
+   char *name;
+   PokemonType TYPE;
+   int hp;
+   int attack;
+   EvolutionStatus CAN_EVOLVE;
 } PokemonData;
 
 // Binary Tree Node (for Pokédex)
 typedef struct PokemonNode
 {
-    PokemonData *data;
-    struct PokemonNode *left;
-    struct PokemonNode *right;
+   PokemonData *data;
+   struct PokemonNode *left;
+   struct PokemonNode *right;
 } PokemonNode;
 
 // Linked List Node (for Owners)
 typedef struct OwnerNode
 {
-    char *ownerName;          // Owner's name
-    PokemonNode *pokedexRoot; // Pointer to the root of the owner's Pokédex
-    struct OwnerNode *next;   // Next owner in the linked list
-    struct OwnerNode *prev;   // Previous owner in the linked list
+   char *ownerName;          // Owner's name
+   PokemonNode *pokedexRoot; // Pointer to the root of the owner's Pokédex
+   struct OwnerNode *next;   // Next owner in the linked list
+   struct OwnerNode *prev;   // Previous owner in the linked list
 } OwnerNode;
 
 // Global head pointer for the linked list of owners
@@ -114,7 +113,7 @@ const char *getTypeName(PokemonType type);
  * @return newly allocated PokemonNode*
  * Why we made it: We need a standard way to allocate BST nodes.
  */
-PokemonNode *createPokemonNode(const PokemonData *data);
+PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int id);
 
 /**
  * @brief Create an OwnerNode for the circular owners list.
@@ -240,9 +239,9 @@ void printPokemonNode(PokemonNode *node);
 
 typedef struct
 {
-    PokemonNode **nodes;
-    int size;
-    int capacity;
+   PokemonNode **nodes;
+   int size;
+   int capacity;
 } NodeArray;
 
 /**
