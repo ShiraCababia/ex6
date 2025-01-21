@@ -165,7 +165,7 @@ PokemonNode *insertPokemonNode(PokemonNode *root, PokemonNode *newNode);
  * @return pointer to found node or NULL
  * Why we made it: BFS ensures we find nodes even in an unbalanced tree.
  */
-PokemonNode *searchPokemonBFS(PokemonNode *root, int id);
+PokemonNode *searchPokemonBST(PokemonNode *root, int id);
 
 /**
  * @brief Remove node from BST by ID if found (BST removal logic).

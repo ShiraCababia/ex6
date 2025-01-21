@@ -14,6 +14,7 @@ Assignment: ex6
 #define BULBASAUR_ID 1
 #define CHARMANDER_ID 4
 #define SQUIRTLE_ID 7
+#define POKEMONS_NUM 151
 
 // ================================================
 // Basic struct definitions from ex6.h assumed:
@@ -28,37 +29,12 @@ Assignment: ex6
 // 1) Safe integer reading
 // --------------------------------------------------------------
 
-void displayBFS(PokemonNode *root)
-{
-    printf("done");
-}
-
-void preOrderTraversal(PokemonNode *root)
-{
-    printf("done");
-}
-
-void inOrderTraversal(PokemonNode *root)
-{
-    printf("done");
-}
-
-void postOrderTraversal(PokemonNode *root)
-{
-    printf("done");
-}
-
-void displayAlphabetical(PokemonNode *root)
-{
-    printf("done");
-}
-
-void freeAllOwners(void)
-{
-    printf("done");
-}
-
-void enterExistingPokedexMenu() {}
+void displayBFS(PokemonNode *root) {}
+void preOrderTraversal(PokemonNode *root) {}
+void inOrderTraversal(PokemonNode *root) {}
+void postOrderTraversal(PokemonNode *root) {}
+void displayAlphabetical(PokemonNode *root) {}
+void freeAllOwners(void) {}
 void deletePokedex() {}
 void mergePokedexMenu() {}
 void sortOwners() {}
@@ -292,21 +268,43 @@ void displayMenu(OwnerNode *owner)
 }
 
 // --------------------------------------------------------------
-// Sub-menu for existing Pokedex
+// Sub-menu for existing Pokedex - CASE 2
 // --------------------------------------------------------------
-/*
+
 void enterExistingPokedexMenu()
 {
-    // list owners
+    // Printing the list of owners
     printf("\nExisting Pokedexes:\n");
-    // you need to implement a few things here :)
-
-    printf("\nEntering %s's Pokedex...\n", cur->ownerName);
-
+    int i = 1, ownerChoice = 0;
+    OwnerNode *currentOwner = ownerHead;
+    while (currentOwner)
+    {
+        printf("%d. %s\n", i, currentOwner->ownerName);
+        if (currentOwner->next == ownerHead)
+        {
+            break;
+        }
+        currentOwner = currentOwner->next;
+        i++;
+    }
+    // "Catching" the owner chosen by the user.
+    ownerChoice = readIntSafe("Choose a Pokedex by number: ");
+    currentOwner = ownerHead;
+    OwnerNode *chosenOwner;
+    for (int i = 0; i < ownerChoice; i++)
+    {
+        if (i + 1 == ownerChoice)
+        {
+            chosenOwner = currentOwner;
+            break;
+        }
+        currentOwner = currentOwner->next;
+    }
+    printf("\nEntering %s's Pokedex...\n", chosenOwner->ownerName);
     int subChoice;
     do
     {
-        printf("\n-- %s's Pokedex Menu --\n", cur->ownerName);
+        printf("\n-- %s's Pokedex Menu --\n", chosenOwner->ownerName);
         printf("1. Add Pokemon\n");
         printf("2. Display Pokedex\n");
         printf("3. Release Pokemon (by ID)\n");
@@ -319,19 +317,19 @@ void enterExistingPokedexMenu()
         switch (subChoice)
         {
         case 1:
-            addPokemon(cur);
+            addPokemon(chosenOwner);
             break;
         case 2:
-            displayMenu(cur);
+            displayMenu(chosenOwner);
             break;
         case 3:
-            freePokemon(cur);
+            freePokemon(chosenOwner);
             break;
         case 4:
-            pokemonFight(cur);
+            pokemonFight(chosenOwner);
             break;
         case 5:
-            evolvePokemon(cur);
+            evolvePokemon(chosenOwner);
             break;
         case 6:
             printf("Back to Main Menu.\n");
@@ -341,7 +339,88 @@ void enterExistingPokedexMenu()
         }
     } while (subChoice != 6);
 }
-*/
+
+// CASE 2 - PART 1 :
+
+/* The function adds a new Pokemon to a given owner's Pokedex. The function ensures the Pokemon is inserted at the
+correct position in the binary search tree and prevents duplicate entries. */
+void addPokemon(OwnerNode *owner)
+{
+    PokemonNode *newPokemonRoot;
+    // Getting the pokemonID from the user and checking validation
+    int pokemonId;
+    pokemonId = readIntSafe("Enter ID to add: ");
+    if (pokemonId < 1 || pokemonId > POKEMONS_NUM)
+    {
+        printf("Invalid ID.\n");
+        return;
+    }
+    // Checking if the pokemonID have already inserted.
+    if (searchPokemonBST(owner->pokedexRoot, pokemonId))
+    {
+        printf("Pokemon with ID %d is already in the Pokedex. No changes made.\n", pokemonId);
+    }
+    else
+    {
+        // If the owner is empty from pokemons
+        if (!owner->pokedexRoot)
+        {
+            createPokemonNode(&owner->pokedexRoot, (pokemonId - 1));
+            printf("Pokemon %s (ID %d) added.\n", owner->pokedexRoot->data->name, pokemonId);
+            return;
+        }
+        // Creating pokemon connected to the newPokemonRoot.
+        createPokemonNode(&newPokemonRoot, (pokemonId - 1));
+        // Inserting the newPokemonRoot to the right place in pokedexRoot of the chosen owner.
+        insertPokemonNode(owner->pokedexRoot, newPokemonRoot);
+        printf("Pokemon %s (ID %d) added.\n", newPokemonRoot->data->name, pokemonId);
+    }
+}
+
+// The function searches for a Pokemon by a given ID in a Binary Search Tree (BST)
+PokemonNode *searchPokemonBST(PokemonNode *root, int id)
+{
+    if (!root)
+    {
+        return NULL;
+    }
+    if (root->data->id > id)
+    {
+        return searchPokemonBST(root->left, id);
+    }
+    if (root->data->id < id)
+    {
+        return searchPokemonBST(root->right, id);
+    }
+    // if (root->data->id == id)
+    return root;
+}
+
+// The function inserts a new PokemonNode to the correct "leaf" from the given root according to the id.
+PokemonNode *insertPokemonNode(PokemonNode *root, PokemonNode *newNode)
+{
+    if (!root)
+    {
+        return newNode;
+    }
+    if (root->data->id > newNode->data->id)
+    {
+        root->left = insertPokemonNode(root->left, newNode);
+    }
+    else if (root->data->id < newNode->data->id)
+    {
+        root->right = insertPokemonNode(root->right, newNode);
+    }
+    return root;
+}
+
+//
+void freePokemonNode(PokemonNode *node) {}
+void pokemonFight(OwnerNode *owner) {}
+void evolvePokemon(OwnerNode *owner) {}
+void freePokemon(OwnerNode *owner) {}
+
+// CASE 1 :
 
 // The function creates a new owner and assigns a starter Pokemon to the root.
 void openPokedexMenu()
@@ -357,21 +436,21 @@ void openPokedexMenu()
     // Get the new owner name from the user.
     printf("Your name: ");
     newOwner->ownerName = getDynamicInput();
-    OwnerNode *current = ownerHead;
+    OwnerNode *currentOwner = ownerHead;
     // Going throuth all the owners list and check duplication of the entered name.
-    while (current)
+    while (currentOwner)
     {
         // If there's already an owner with that name.
-        if (strcmp(newOwner->ownerName, current->ownerName) == 0)
+        if (strcmp(newOwner->ownerName, currentOwner->ownerName) == 0)
         {
             printf("Owner '%s' already exists. Not creating a new Pokedex.\n", newOwner->ownerName);
             free(newOwner->ownerName);
             free(newOwner);
             return;
         }
-        current = current->next;
+        currentOwner = currentOwner->next;
         // If we got to the beginning, get out since we're done checking.
-        if (current == ownerHead)
+        if (currentOwner == ownerHead)
         {
             break;
         }
@@ -405,7 +484,7 @@ void openPokedexMenu()
         pokemonId = SQUIRTLE_ID;
     }
     // Create the correct pokedex in the newOwner.
-    createPokemonNode(&newOwner->pokedexRoot, (pokemonId-1));
+    createPokemonNode(&newOwner->pokedexRoot, (pokemonId - 1));
     // If the owners list is empty, initialize it with the new owner.
     if (ownerHead == NULL)
     {
@@ -416,20 +495,20 @@ void openPokedexMenu()
         return;
     }
     // Add the new owner to the "end" of the circular linked list.
-    current = ownerHead;
-    while (current->next != ownerHead)
+    currentOwner = ownerHead;
+    while (currentOwner->next != ownerHead)
     {
-        current = current->next;
+        currentOwner = currentOwner->next;
     }
-    current->next = newOwner;
+    currentOwner->next = newOwner;
     newOwner->next = ownerHead;
     ownerHead->prev = newOwner;
-    newOwner->prev = current;
+    newOwner->prev = currentOwner;
     printf("New Pokedex created for %s with starter %s.\n", newOwner->ownerName, newOwner->pokedexRoot->data->name);
 }
 
 // The function createz a new Pokemon (node) and initialize it with the data from the pokedex with the given id.
-PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int id)
+PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
 {
     // Allocate memory for a new PokemonNode.
     PokemonNode *newPokemon = (PokemonNode *)malloc(sizeof(PokemonNode));
@@ -448,12 +527,12 @@ PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int id)
         exit(1);
     }
     // Copy the data from the fit pokedex into the new PokemonData.
-    newPokemon->data->attack = pokedex[id].attack;
-    newPokemon->data->CAN_EVOLVE = pokedex[id].CAN_EVOLVE;
-    newPokemon->data->hp = pokedex[id].hp;
-    newPokemon->data->id = pokedex[id].id;
-    newPokemon->data->name = myStrdup(pokedex[id].name);
-    newPokemon->data->TYPE = pokedex[id].TYPE;
+    newPokemon->data->attack = pokedex[pokemonIndx].attack;
+    newPokemon->data->CAN_EVOLVE = pokedex[pokemonIndx].CAN_EVOLVE;
+    newPokemon->data->hp = pokedex[pokemonIndx].hp;
+    newPokemon->data->id = pokedex[pokemonIndx].id;
+    newPokemon->data->name = myStrdup(pokedex[pokemonIndx].name);
+    newPokemon->data->TYPE = pokedex[pokemonIndx].TYPE;
     // Set the left and right to NULL (initially no children).
     newPokemon->left = NULL;
     newPokemon->right = NULL;
