@@ -721,6 +721,49 @@ void freePokemonNode(PokemonNode *node)
     free(node);
 }
 
+// CASE 2 - PART 4 :
+
+// The function simulates a fight between two Pokemons and prints the winner
+void pokemonFight(OwnerNode *owner)
+{
+    float firstPokemonScore = 0, secondPokemonScore = 0;
+    // Check if the owner's Pokedex is empty
+    if (!owner->pokedexRoot)
+    {
+        printf("Pokedex is empty.\n");
+        return;
+    }
+    int firstPokemonId = readIntSafe("Enter ID of the first Pokemon: ");
+    int secondPokemonId = readIntSafe("Enter ID of the second Pokemon: ");
+    // Search and "catch" the two Pokemons in the owner's Pokedex using their IDs
+    PokemonNode *firstPokemon = searchPokemonBST(owner->pokedexRoot, firstPokemonId);
+    PokemonNode *secondPokemon = searchPokemonBST(owner->pokedexRoot, secondPokemonId);
+    // If either of the Pokemons is not found, print a proper message and exit
+    if (!firstPokemon || !secondPokemon)
+    {
+        printf("One or both Pokemon IDs not found.\n");
+        return;
+    }
+    // Calculate the scores for the pokemons
+    firstPokemonScore = (firstPokemon->data->attack * 1.5) + (firstPokemon->data->hp * 1.2);
+    secondPokemonScore = (secondPokemon->data->attack * 1.5) + (secondPokemon->data->hp * 1.2);
+    printf("Pokemon 1: %s (Score = %.2f)\n", firstPokemon->data->name, firstPokemonScore);
+    printf("Pokemon 2: %s (Score = %.2f)\n", secondPokemon->data->name, secondPokemonScore);
+    // Check which pokemon wins and print a proper message
+    if (firstPokemonScore > secondPokemonScore)
+    {
+        printf("%s wins!\n", firstPokemon->data->name);
+    }
+    else if (secondPokemonScore > firstPokemonScore)
+    {
+        printf("%s wins!\n", secondPokemon->data->name);
+    }
+    else
+    {
+        printf("It's a tie!\n");
+    }
+}
+
 // --------------------------------------------------------------
 // 1) Safe integer reading
 // --------------------------------------------------------------
@@ -915,5 +958,4 @@ void deletePokedex() {}
 void mergePokedexMenu() {}
 void sortOwners() {}
 void printOwnersCircular() {}
-void pokemonFight(OwnerNode *owner) {}
 void evolvePokemon(OwnerNode *owner) {}
