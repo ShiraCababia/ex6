@@ -29,16 +29,16 @@ Assignment: ex6
 // 1) Safe integer reading
 // --------------------------------------------------------------
 
-void displayBFS(PokemonNode *root) {}
-void preOrderTraversal(PokemonNode *root) {}
-void inOrderTraversal(PokemonNode *root) {}
-void postOrderTraversal(PokemonNode *root) {}
 void displayAlphabetical(PokemonNode *root) {}
 void freeAllOwners(void) {}
 void deletePokedex() {}
 void mergePokedexMenu() {}
 void sortOwners() {}
 void printOwnersCircular() {}
+void freePokemonNode(PokemonNode *node) {}
+void pokemonFight(OwnerNode *owner) {}
+void evolvePokemon(OwnerNode *owner) {}
+void freePokemon(OwnerNode *owner) {}
 
 void trimWhitespace(char *str)
 {
@@ -226,7 +226,7 @@ void printPokemonNode(PokemonNode *node)
 }
 
 // --------------------------------------------------------------
-// Display Menu
+// Display Menu - CASE 2 - PART 2 :
 // --------------------------------------------------------------
 void displayMenu(OwnerNode *owner)
 {
@@ -235,16 +235,13 @@ void displayMenu(OwnerNode *owner)
         printf("Pokedex is empty.\n");
         return;
     }
-
     printf("Display:\n");
     printf("1. BFS (Level-Order)\n");
     printf("2. Pre-Order\n");
     printf("3. In-Order\n");
     printf("4. Post-Order\n");
     printf("5. Alphabetical (by name)\n");
-
     int choice = readIntSafe("Your choice: ");
-
     switch (choice)
     {
     case 1:
@@ -267,8 +264,108 @@ void displayMenu(OwnerNode *owner)
     }
 }
 
+// CASE 2 PART 2 - OPTION 1 (BFS- Level-Order):
+void displayBFS(PokemonNode *root)
+{
+    if (!root)
+    {
+        printf("Pokedex is empty.\n");
+        return;
+    }
+    BFSGeneric(root, printPokemonNode);
+}
+
+// The function displays all Pokemons from a given root in the Pokedex Level-Order.
+void BFSGeneric(PokemonNode *root, VisitNodeFunc visit)
+{
+}
+
+// CASE 2 PART 2 - OPTION 2 (Pre-Order) :
+void preOrderTraversal(PokemonNode *root)
+{
+    if (!root)
+    {
+        printf("Pokedex is empty.\n");
+        return;
+    }
+    preOrderGeneric(root, printPokemonNode);
+}
+
+// The function displays all Pokemons from a given root in the Pokedex Pre-Order.
+void preOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
+{
+    if (root)
+    {
+        visit(root);
+    }
+    if (root->left)
+    {
+        preOrderGeneric(root->left, visit);
+    }
+    if (root->right)
+    {
+        preOrderGeneric(root->right, visit);
+    }
+}
+
+// CASE 2 PART 2 - OPTION 3 (In-Order) :
+void inOrderTraversal(PokemonNode *root)
+{
+    if (!root)
+    {
+        printf("Pokedex is empty.\n");
+        return;
+    }
+    inOrderGeneric(root, printPokemonNode);
+}
+
+// The function displays all Pokemons from a given root in the Pokedex In-Order.
+void inOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
+{
+    if (root->left)
+    {
+        inOrderGeneric(root->left, visit);
+    }
+    if (root)
+    {
+        visit(root);
+    }
+    if (root->right)
+    {
+        inOrderGeneric(root->right, visit);
+    }
+}
+
+// CASE 2 PART 2 - OPTION 3 (Post-Order) :
+void postOrderTraversal(PokemonNode *root)
+{
+    if (!root)
+    {
+        printf("Pokedex is empty.\n");
+        return;
+    }
+    postOrderGeneric(root, printPokemonNode);
+}
+
+// The function displays all Pokemons from a given root in the Pokedex Post-Order.
+void postOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
+{
+    if (root->left)
+    {
+        postOrderGeneric(root->left, visit);
+    }
+    if (root->right)
+    {
+        postOrderGeneric(root->right, visit);
+    }
+    if (root)
+    {
+        visit(root);
+    }
+}
+
 // --------------------------------------------------------------
-// Sub-menu for existing Pokedex - CASE 2
+// Sub-menu for existing Pokedex - CASE 2 :
 // --------------------------------------------------------------
 
 void enterExistingPokedexMenu()
@@ -413,12 +510,6 @@ PokemonNode *insertPokemonNode(PokemonNode *root, PokemonNode *newNode)
     }
     return root;
 }
-
-//
-void freePokemonNode(PokemonNode *node) {}
-void pokemonFight(OwnerNode *owner) {}
-void evolvePokemon(OwnerNode *owner) {}
-void freePokemon(OwnerNode *owner) {}
 
 // CASE 1 :
 
