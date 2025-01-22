@@ -29,7 +29,6 @@ Assignment: ex6
 // 1) Safe integer reading
 // --------------------------------------------------------------
 
-void displayAlphabetical(PokemonNode *root) {}
 void freeAllOwners(void) {}
 void deletePokedex() {}
 void mergePokedexMenu() {}
@@ -278,6 +277,67 @@ void displayBFS(PokemonNode *root)
 // The function displays all Pokemons from a given root in the Pokedex Level-Order.
 void BFSGeneric(PokemonNode *root, VisitNodeFunc visit)
 {
+    int maxCapacity = POKEMONS_NUM;
+    int startIndex = 0;
+    int endIndex = 0;
+    // Allocate memory for the array of pointers to pokemons
+    PokemonNode **newPokemon = malloc(POKEMONS_NUM * sizeof(PokemonNode *));
+    if (!newPokemon)
+    {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    // Insert the root to the arr
+    newPokemon[endIndex] = root;
+    endIndex++;
+    // Continue iterating through the list, handling each node until the list is fully processed
+    while (startIndex < endIndex)
+    {
+        PokemonNode *currentPokemon = newPokemon[startIndex];
+        startIndex++;
+        visit(currentPokemon);
+        // If the current pokemon has a left child, add it to the dynamic array
+        if (currentPokemon->left)
+        {
+            // If the array is full, increase its capacity
+            if (endIndex >= maxCapacity)
+            {
+                maxCapacity = maxCapacity * 2;
+                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                if (!tempPokemon)
+                {
+                    printf("Memory allocation failed\n");
+                    free(newPokemon);
+                    exit(1);
+                }
+                newPokemon = tempPokemon;
+            }
+            // Insert the left "leaf" of the root to the arr
+            newPokemon[endIndex] = currentPokemon->left;
+            endIndex++;
+        }
+        // If the current pokemon has a right child, add it to the dynamic array
+        if (currentPokemon->right)
+        {
+            // If the array is full, increase its capacity
+            if (endIndex >= maxCapacity)
+            {
+                maxCapacity = maxCapacity * 2;
+                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                if (!tempPokemon)
+                {
+                    printf("Memory allocation failed\n");
+                    free(newPokemon);
+                    exit(1);
+                }
+                newPokemon = tempPokemon;
+            }
+            // Insert the right "leaf" of the root to the arr
+            newPokemon[endIndex] = currentPokemon->right;
+            endIndex++;
+        }
+    }
+    free(newPokemon);
 }
 
 // CASE 2 PART 2 - OPTION 2 (Pre-Order) :
@@ -336,7 +396,7 @@ void inOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
     }
 }
 
-// CASE 2 PART 2 - OPTION 3 (Post-Order) :
+// CASE 2 PART 2 - OPTION 4 (Post-Order) :
 void postOrderTraversal(PokemonNode *root)
 {
     if (!root)
@@ -362,6 +422,94 @@ void postOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
     {
         visit(root);
     }
+}
+
+// CASE 2 PART 2 - OPTION 5 (Alphabetical - By Name) :
+// The function displays all Pokemons from a given root in the Pokedex Alphabetically.
+void displayAlphabetical(PokemonNode *root)
+{
+    int maxCapacity = POKEMONS_NUM;
+    int startIndex = 0;
+    int endIndex = 0;
+    PokemonNode *lastPokemon;
+    // Allocate memory for the array of pointers to pokemons
+    PokemonNode **newPokemon = malloc(POKEMONS_NUM * sizeof(PokemonNode *));
+    if (!newPokemon)
+    {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    // Insert the root to the arr
+    newPokemon[endIndex] = root;
+    endIndex++;
+    // Continue iterating through the list, handling each node until the list is fully processed
+    while (startIndex < endIndex)
+    {
+        PokemonNode *currentPokemon = newPokemon[startIndex];
+        startIndex++;
+        // If the current pokemon has a left child
+        if (currentPokemon->left)
+        {
+            // If the array is full, increase its capacity
+            if (endIndex >= maxCapacity)
+            {
+                maxCapacity = maxCapacity * 2;
+                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                if (!tempPokemon)
+                {
+                    printf("Memory allocation failed\n");
+                    free(newPokemon);
+                    exit(1);
+                }
+                newPokemon = tempPokemon;
+            }
+            // Insert the left "leaf" of the root to the arr
+            newPokemon[endIndex] = currentPokemon->left;
+            endIndex++;
+        }
+        // If the current pokemon has a right child
+        if (currentPokemon->right)
+        {
+            // If the array is full, increase its capacity
+            if (endIndex >= maxCapacity)
+            {
+                maxCapacity = maxCapacity * 2;
+                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                if (!tempPokemon)
+                {
+                    printf("Memory allocation failed\n");
+                    free(newPokemon);
+                    exit(1);
+                }
+                newPokemon = tempPokemon;
+            }
+            // Insert the right "leaf" of the root to the arr
+            newPokemon[endIndex] = currentPokemon->right;
+            endIndex++;
+        }
+    }
+    // Sort the pokemons alphabetically in the arr
+    for (int i = 0; i < startIndex; i++)
+    {
+        for (int j = 0; j < startIndex - 1; j++)
+        {
+            // Compare the current pokemon's name with the next pokemon's name
+            if (strcmp(newPokemon[j]->data->name, newPokemon[j + 1]->data->name) > 0)
+            {
+                // Switch the positions of pokemons if they're not in the correct order
+                lastPokemon = newPokemon[j + 1];
+                newPokemon[j + 1] = newPokemon[j];
+                newPokemon[j] = lastPokemon;
+            }
+        }
+    }
+    // Print the sorted pokemons
+    for (int i = 0; i < startIndex; i++)
+    {
+        printPokemonNode(newPokemon[i]);
+    }
+    // Free the allocated memory
+    free(newPokemon);
 }
 
 // --------------------------------------------------------------
