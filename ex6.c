@@ -166,7 +166,7 @@ void openPokedexMenu()
     printf("New Pokedex created for %s with starter %s.\n", newOwner->ownerName, newOwner->pokedexRoot->data->name);
 }
 
-// The function createz a new Pokemon (node) and initialize it with the data from the pokedex with the given id.
+// The function creates a new Pokemon (node) and initialize it with the data from the pokedex with the given index.
 PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
 {
     // Allocate memory for a new PokemonNode.
@@ -764,6 +764,58 @@ void pokemonFight(OwnerNode *owner)
     }
 }
 
+// CASE 2 - PART 5 :
+
+// The function evolves a Pokemon in the owner's Pokedex
+void evolvePokemon(OwnerNode *owner)
+{
+    // Check if the owner's Pokedex is empty
+    if (!owner->pokedexRoot)
+    {
+        printf("Cannot evolve. Pokedex empty.\n");
+        return;
+    }
+    int pokemonId = readIntSafe("Enter ID of Pokemon to evolve: ");
+    // Search and "catch" the Pokemon in the owner's Pokedex using its ID
+    PokemonNode *pokemonToEvolve = searchPokemonBST(owner->pokedexRoot, pokemonId);
+    // If pokemon doesn't exist in pokedex
+    if (!pokemonToEvolve)
+    {
+        printf("No Pokemon with ID %d found.\n", pokemonId);
+        return;
+    }
+    // If pokemon can't evolve
+    if (!pokemonToEvolve->data->CAN_EVOLVE)
+    {
+        printf("%s (ID %d) cannot evolve.\n", pokemonToEvolve->data->name, pokemonId);
+    }
+    // If the pokemon exist and can evolve
+    else
+    {
+        // Search and "catch" the Pokemon that its Id is the user's unput Id + 1
+        PokemonNode *evolvedPokemon = searchPokemonBST(owner->pokedexRoot, (pokemonId + 1));
+        // If the evolved pokemon already exist, print proper messages
+        if (evolvedPokemon)
+        {
+            printf("Evolution ID %d (%s) already in the Pokedex. Releasing %s (ID %d).\n",
+                   (pokemonId + 1), evolvedPokemon->data->name, pokemonToEvolve->data->name, pokemonId);
+            printf("Removing Pokemon %s (ID %d).\n", pokemonToEvolve->data->name, pokemonId);
+        }
+        /* If the evolved pokemon doesn't exist in the pokedex -
+        Create the evolvedPokemon and insert it to the pokedex root */
+        else
+        {
+            createPokemonNode(&evolvedPokemon, pokemonId);
+            insertPokemonNode(owner->pokedexRoot, evolvedPokemon);
+            printf("Removing Pokemon %s (ID %d).\n", pokemonToEvolve->data->name, pokemonId);
+            printf("Pokemon evolved from %s (ID %d) to %s (ID %d).\n", pokemonToEvolve->data->name, pokemonId,
+                   evolvedPokemon->data->name, (pokemonId + 1));
+        }
+        // Remove the pokemon the user chose to evolve
+        owner->pokedexRoot = removeNodeBST(owner->pokedexRoot, pokemonId);
+    }
+}
+
 // --------------------------------------------------------------
 // 1) Safe integer reading
 // --------------------------------------------------------------
@@ -958,4 +1010,3 @@ void deletePokedex() {}
 void mergePokedexMenu() {}
 void sortOwners() {}
 void printOwnersCircular() {}
-void evolvePokemon(OwnerNode *owner) {}
