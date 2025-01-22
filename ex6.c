@@ -636,14 +636,89 @@ void displayAlphabetical(PokemonNode *root)
 
 // CASE 2 - PART 3 :
 
-//
+// The function releases a Pokemon from an owner's Pokedex.
 void freePokemon(OwnerNode *owner)
 {
+    if (!owner->pokedexRoot)
+    {
+        printf("No Pokemon to release.\n");
+        return;
+    }
+    int pokemonIdToRelease = readIntSafe("Enter Pokemon ID to release: ");
+    // Search and "catch" the Pokemon in the owner's Pokedex using the provided ID
+    PokemonNode *pokemonToRelease = searchPokemonBST(owner->pokedexRoot, pokemonIdToRelease);
+    // If no Pokemon with the given ID is found, print a message and exit
+    if (!pokemonToRelease)
+    {
+        printf("No Pokemon with ID %d found.\n", pokemonIdToRelease);
+        return;
+    }
+    char *pokemonNameToRelease = myStrdup(pokemonToRelease->data->name);
+    // Remove the Pokemon from the Pokedex using the removeNodeBST function
+    owner->pokedexRoot = removeNodeBST(owner->pokedexRoot, pokemonIdToRelease);
+    printf("Removing Pokemon %s (ID %d).\n", pokemonNameToRelease, pokemonIdToRelease);
+    free(pokemonToRelease->data->name);
 }
 
-//
+// The function removes Pokemon by a given ID from a given pokedex root, and maintain the BST structur.
+PokemonNode *removeNodeBST(PokemonNode *root, int id)
+{
+    if (!root)
+    {
+        return NULL;
+    }
+    // Move left if the ID is smaller than the root's ID
+    if (root->data->id > id)
+    {
+        root->left = removeNodeBST(root->left, id);
+    }
+    // Move right if the ID is bigger than the root's ID
+    else if (root->data->id < id)
+    {
+        root->right = removeNodeBST(root->right, id);
+    }
+    // When the pokemon is found (id == root->data->id)
+    else
+    {
+        // If pokemon has no left child, replace it with the right child
+        if (!root->left)
+        {
+            PokemonNode *rightPokemon = root->right;
+            freePokemonNode(root);
+            return rightPokemon;
+        }
+        // If pokemon has no right child, replace it with the left child
+        if (!root->right)
+        {
+            PokemonNode *leftPokemon = root->left;
+            freePokemonNode(root);
+            return leftPokemon;
+        }
+        // Find the leftmost child of the right root
+        PokemonNode *tempPokemon = findLeftmost(root->right);
+        // Replace the current pokemon's data with the leftmost pokemon's data
+        *root->data = *tempPokemon->data;
+        // Remove the leftmost pokemon from the right root
+        root->right = removeNodeBST(root->right, tempPokemon->data->id);
+    }
+    return root;
+}
+
+// The function finds and returns the leftmost pokemon in the root
+PokemonNode *findLeftmost(PokemonNode *root)
+{
+    while (root && root->left)
+    {
+        root = root->left;
+    }
+    return root;
+}
+
+// The function free the given pokemon
 void freePokemonNode(PokemonNode *node)
 {
+    free(node->data);
+    free(node);
 }
 
 // --------------------------------------------------------------

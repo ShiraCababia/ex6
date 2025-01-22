@@ -344,6 +344,9 @@ void addPokemon(OwnerNode *owner);
  */
 void freePokemon(OwnerNode *owner);
 
+// The function finds and returns the leftmost pokemon in the root
+PokemonNode *findLeftmost(PokemonNode *root);
+
 /* ------------------------------------------------------------
    7) Display Menu for a Pokedex
    ------------------------------------------------------------ */
