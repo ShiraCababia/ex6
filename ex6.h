@@ -113,7 +113,7 @@ const char *getTypeName(PokemonType type);
  * @return newly allocated PokemonNode*
  * Why we made it: We need a standard way to allocate BST nodes.
  */
-PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int id);
+void createPokemonNode(PokemonNode **pokemonRoot, int id);
 
 /**
  * @brief Create an OwnerNode for the circular owners list.

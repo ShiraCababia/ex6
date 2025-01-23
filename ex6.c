@@ -167,7 +167,7 @@ void openPokedexMenu()
 }
 
 // The function creates a new Pokemon (node) and initialize it with the data from the pokedex with the given index.
-PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
+void createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
 {
     // Allocate memory for a new PokemonNode.
     PokemonNode *newPokemon = (PokemonNode *)malloc(sizeof(PokemonNode));
@@ -181,7 +181,7 @@ PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
     if (!newPokemon->data)
     {
         printf("Memory allocation failed\n");
-        free(newPokemon->data);
+        // free(newPokemon->data);
         free(newPokemon);
         exit(1);
     }
@@ -205,19 +205,24 @@ PokemonNode *createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
 
 void enterExistingPokedexMenu()
 {
+    if (!ownerHead)
+    {
+        printf("No existing Pokedexes.\n");
+        return;
+    }
     // Printing the list of owners
     printf("\nExisting Pokedexes:\n");
-    int i = 1, ownerChoice = 0;
+    int x = 1, ownerChoice = 0;
     OwnerNode *currentOwner = ownerHead;
     while (currentOwner)
     {
-        printf("%d. %s\n", i, currentOwner->ownerName);
+        printf("%d. %s\n", x, currentOwner->ownerName);
         if (currentOwner->next == ownerHead)
         {
             break;
         }
         currentOwner = currentOwner->next;
-        i++;
+        x++;
     }
     // "Catching" the owner chosen by the user.
     ownerChoice = readIntSafe("Choose a Pokedex by number: ");
@@ -582,6 +587,7 @@ void displayAlphabetical(PokemonNode *root)
                     exit(1);
                 }
                 newPokemon = tempPokemon;
+                // free(tempPokemon);
             }
             // Insert the left "leaf" of the root to the arr
             newPokemon[endIndex] = currentPokemon->left;
@@ -602,6 +608,7 @@ void displayAlphabetical(PokemonNode *root)
                     exit(1);
                 }
                 newPokemon = tempPokemon;
+                // free(tempPokemon);
             }
             // Insert the right "leaf" of the root to the arr
             newPokemon[endIndex] = currentPokemon->right;
@@ -819,8 +826,13 @@ void evolvePokemon(OwnerNode *owner)
 // The function let the user choose a pokedex to delete and deletes it
 void deletePokedex()
 {
+    if (!ownerHead)
+    {
+        printf("No existing Pokedexes to delete.\n");
+        return;
+    }
     // Printing the list of pokedexes
-    printf("=== Delete a Pokedex ===\n");
+    printf("\n=== Delete a Pokedex ===\n");
     int i = 1, pokedexChoice = 0;
     OwnerNode *currentPokedex = ownerHead;
     while (currentPokedex)
@@ -846,7 +858,7 @@ void deletePokedex()
         }
         currentPokedex = currentPokedex->next;
     }
-    printf("\nDeleting %s's entire Pokedex...\n", chosenOwner->ownerName);
+    printf("Deleting %s's entire Pokedex...\n", chosenOwner->ownerName);
     // Remove the chosen pokedex (owner) using a function
     removeOwner(chosenOwner);
     printf("Pokedex deleted.\n");
@@ -910,7 +922,7 @@ void mergePokedexMenu()
         printf("Not enough owners to merge.\n");
         return;
     }
-    printf("=== Merge Pokedexes ===\n");
+    printf("\n=== Merge Pokedexes ===\n");
     printf("Enter name of first owner: ");
     char *firstOwnerName = getDynamicInput();
     printf("Enter name of second owner: ");
@@ -1059,6 +1071,7 @@ void sortOwners()
     // Commit the sorting of the list:
     for (int i = 0; i < numOfOwners - 1; i++)
     {
+        currentOwner = ownerHead;
         for (int j = 0; j < (numOfOwners - 1 - i); j++)
         {
             nextOwner = currentOwner->next;
@@ -1119,7 +1132,7 @@ void printOwnersCircular()
         return;
     }
     // If the direction chosen is B (\b), print the owners in the list in Backward order
-    if (direction == 'b' || direction == 'B')
+    if (direction == 'B' || direction == 'b')
     {
         for (int i = 1; i <= numOfPrints; i++)
         {
