@@ -433,6 +433,9 @@ void deletePokedex(void);
  */
 void mergePokedexMenu(void);
 
+//
+PokemonNode *searchPokemonBFS(PokemonNode *root, int id);
+
 /* ------------------------------------------------------------
    11) Printing Owners in a Circle
    ------------------------------------------------------------ */

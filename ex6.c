@@ -385,7 +385,7 @@ void displayMenu(OwnerNode *owner)
     }
 }
 
-// CASE 2 PART 2 - OPTION 1 (BFS- Level-Order):
+// CASE 2 PART 2 - OPTION 1 :
 void displayBFS(PokemonNode *root)
 {
     if (!root)
@@ -399,23 +399,21 @@ void displayBFS(PokemonNode *root)
 // The function displays all Pokemons from a given root in the Pokedex Level-Order.
 void BFSGeneric(PokemonNode *root, VisitNodeFunc visit)
 {
-    int maxCapacity = POKEMONS_NUM;
-    int startIndex = 0;
-    int endIndex = 0;
+    int maxCapacity = POKEMONS_NUM, startIndex = 0, endIndex = 0;
     // Allocate memory for the array of pointers to pokemons
-    PokemonNode **newPokemon = malloc(POKEMONS_NUM * sizeof(PokemonNode *));
-    if (!newPokemon)
+    PokemonNode **pokemons = malloc(POKEMONS_NUM * sizeof(PokemonNode *));
+    if (!pokemons)
     {
         printf("Memory allocation failed\n");
         exit(1);
     }
     // Insert the root to the arr
-    newPokemon[endIndex] = root;
+    pokemons[endIndex] = root;
     endIndex++;
     // Continue iterating through the list, handling each node until the list is fully processed
     while (startIndex < endIndex)
     {
-        PokemonNode *currentPokemon = newPokemon[startIndex];
+        PokemonNode *currentPokemon = pokemons[startIndex];
         startIndex++;
         visit(currentPokemon);
         // If the current pokemon has a left child, add it to the dynamic array
@@ -425,17 +423,17 @@ void BFSGeneric(PokemonNode *root, VisitNodeFunc visit)
             if (endIndex >= maxCapacity)
             {
                 maxCapacity = maxCapacity * 2;
-                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                PokemonNode **tempPokemon = realloc(pokemons, sizeof(PokemonNode *) * maxCapacity);
                 if (!tempPokemon)
                 {
                     printf("Memory allocation failed\n");
-                    free(newPokemon);
+                    free(pokemons);
                     exit(1);
                 }
-                newPokemon = tempPokemon;
+                pokemons = tempPokemon;
             }
             // Insert the left "leaf" of the root to the arr
-            newPokemon[endIndex] = currentPokemon->left;
+            pokemons[endIndex] = currentPokemon->left;
             endIndex++;
         }
         // If the current pokemon has a right child, add it to the dynamic array
@@ -445,24 +443,24 @@ void BFSGeneric(PokemonNode *root, VisitNodeFunc visit)
             if (endIndex >= maxCapacity)
             {
                 maxCapacity = maxCapacity * 2;
-                PokemonNode **tempPokemon = realloc(newPokemon, sizeof(PokemonNode *) * maxCapacity);
+                PokemonNode **tempPokemon = realloc(pokemons, sizeof(PokemonNode *) * maxCapacity);
                 if (!tempPokemon)
                 {
                     printf("Memory allocation failed\n");
-                    free(newPokemon);
+                    free(pokemons);
                     exit(1);
                 }
-                newPokemon = tempPokemon;
+                pokemons = tempPokemon;
             }
             // Insert the right "leaf" of the root to the arr
-            newPokemon[endIndex] = currentPokemon->right;
+            pokemons[endIndex] = currentPokemon->right;
             endIndex++;
         }
     }
-    free(newPokemon);
+    free(pokemons);
 }
 
-// CASE 2 PART 2 - OPTION 2 (Pre-Order) :
+// CASE 2 PART 2 - OPTION 2 :
 void preOrderTraversal(PokemonNode *root)
 {
     if (!root)
@@ -490,7 +488,7 @@ void preOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
     }
 }
 
-// CASE 2 PART 2 - OPTION 3 (In-Order) :
+// CASE 2 PART 2 - OPTION 3 :
 void inOrderTraversal(PokemonNode *root)
 {
     if (!root)
@@ -518,7 +516,7 @@ void inOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
     }
 }
 
-// CASE 2 PART 2 - OPTION 4 (Post-Order) :
+// CASE 2 PART 2 - OPTION 4 :
 void postOrderTraversal(PokemonNode *root)
 {
     if (!root)
@@ -546,7 +544,7 @@ void postOrderGeneric(PokemonNode *root, VisitNodeFunc visit)
     }
 }
 
-// CASE 2 PART 2 - OPTION 5 (Alphabetical - By Name) :
+// CASE 2 PART 2 - OPTION 5 :
 // The function displays all Pokemons from a given root in the Pokedex Alphabetically.
 void displayAlphabetical(PokemonNode *root)
 {
@@ -871,7 +869,7 @@ void removeOwner(OwnerNode *owner)
     // Link between the previous and next owners of the current (-to be removed) owner
     owner->prev->next = owner->next;
     owner->next->prev = owner->prev;
-    // If the owner being removed is the head of the list, update the head 
+    // If the owner being removed is the head of the list, update the head
     if (ownerHead == owner)
     {
         ownerHead = owner->next;
@@ -898,6 +896,147 @@ void freePokemonTree(PokemonNode *root)
     freePokemonTree(root->left);
     freePokemonTree(root->right);
     freePokemonNode(root);
+}
+
+// CASE 4 :
+
+/* The function merges 2 Pokedexes by user's choice, ensuring no duplicate Pokemon,
+and removes the second owner after the merge. */
+void mergePokedexMenu()
+{
+    // Check if there are at least two pokedexes to merge
+    if (!ownerHead || ownerHead == ownerHead->next)
+    {
+        printf("Not enough owners to merge.\n");
+        return;
+    }
+    printf("=== Merge Pokedexes ===\n");
+    printf("Enter name of first owner: ");
+    char *firstOwnerName = getDynamicInput();
+    printf("Enter name of second owner: ");
+    char *secondOwnerName = getDynamicInput();
+    OwnerNode *firstOwner = NULL, *secondOwner = NULL, *currentOwner = ownerHead;
+    // "Catch" the two pokedexes by the names entered by the user
+    do
+    {
+        if (strcmp(currentOwner->ownerName, firstOwnerName) == 0)
+        {
+            firstOwner = currentOwner;
+        }
+        if (strcmp(currentOwner->ownerName, secondOwnerName) == 0)
+        {
+            secondOwner = currentOwner;
+            // Remember the previous owner to adjust the linked list later
+            // previous = currentOwner;
+        }
+        currentOwner = currentOwner->next;
+    } while (currentOwner != ownerHead);
+    // If at least one of the owners wasn't found
+    if (!firstOwner || !secondOwner)
+    {
+        printf("One or both owners not found.\n");
+        free(firstOwnerName);
+        free(secondOwnerName);
+        return;
+    }
+    printf("Merging %s and %s...\n", firstOwner->ownerName, secondOwner->ownerName);
+    // If the second owner pokedex is empty, remove it without changing the first owner pokedex
+    if (!secondOwner->pokedexRoot)
+    {
+        removeOwner(secondOwner);
+        printf("Merge completed.\n");
+        printf("Owner '%s' has been removed after merging.\n", secondOwnerName);
+        free(firstOwnerName);
+        free(secondOwnerName);
+        return;
+    }
+    // Commit merge:
+    PokemonNode **pokemons = (PokemonNode **)malloc(sizeof(PokemonNode *) * POKEMONS_NUM);
+    if (!pokemons)
+    {
+        printf("Memory allocation failed.\n");
+        free(firstOwnerName);
+        free(secondOwnerName);
+        return;
+    }
+    int curIndx = 0, nextIndx = 0;
+    pokemons[nextIndx] = secondOwner->pokedexRoot;
+    nextIndx++;
+    // Continue iterating through the list, handling each node until the list is fully processed
+    while (curIndx < nextIndx)
+    {
+        PokemonNode *currentPokemon = pokemons[curIndx];
+        curIndx++;
+        // If the Pokemon doesn't exist in the first owner's Pokedex - Add it
+        if (!searchPokemonBFS(firstOwner->pokedexRoot, currentPokemon->data->id))
+        {
+            PokemonNode *newPokemonRoot;
+            createPokemonNode(&newPokemonRoot, (currentPokemon->data->id - 1));
+            insertPokemonNode(firstOwner->pokedexRoot, newPokemonRoot);
+        }
+        // Add all the "leaves" from the current Pokemon root
+        if (currentPokemon->left)
+        {
+            pokemons[nextIndx] = currentPokemon->left;
+            nextIndx++;
+        }
+        if (currentPokemon->right)
+        {
+            pokemons[nextIndx] = currentPokemon->right;
+            nextIndx++;
+        }
+    }
+    // Remove the second pokedex, free relevant allocated memory , and display success messages
+    removeOwner(secondOwner);
+    printf("Merge completed.\n");
+    printf("Owner '%s' has been removed after merging.\n", secondOwnerName);
+    free(pokemons);
+    free(firstOwnerName);
+    free(secondOwnerName);
+}
+
+// The function searches a pokemon by given id using BFS search.
+PokemonNode *searchPokemonBFS(PokemonNode *root, int id)
+{
+    if (!root)
+    {
+        return NULL;
+    }
+    PokemonNode **pokemons = (PokemonNode **)malloc(sizeof(PokemonNode *) * POKEMONS_NUM);
+    if (!pokemons)
+    {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    int curIndx = 0, nextIndx = 0;
+    pokemons[nextIndx] = root;
+    nextIndx++;
+    // Going through the roots using BFS.
+    while (curIndx < nextIndx)
+    {
+        PokemonNode *currentPokemon = pokemons[curIndx];
+        curIndx++;
+        // Check if the current pokemon matches the given ID.
+        if (currentPokemon->data->id == id)
+        {
+            free(pokemons);
+            return currentPokemon;
+        }
+        // If the pokemon has left/right "leaves", add them
+        if (currentPokemon->left)
+        {
+            pokemons[nextIndx] = currentPokemon->left;
+            nextIndx++;
+        }
+        if (currentPokemon->right)
+        {
+            pokemons[nextIndx] = currentPokemon->right;
+            nextIndx++;
+        }
+    }
+    // If the given id wasn't found, free and return NULL
+    free(pokemons);
+    return NULL;
 }
 
 // --------------------------------------------------------------
@@ -1090,6 +1229,5 @@ void printPokemonNode(PokemonNode *node)
 
 // Others :
 void freeAllOwners(void) {}
-void mergePokedexMenu() {}
 void sortOwners() {}
 void printOwnersCircular() {}
