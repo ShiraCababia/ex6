@@ -1039,6 +1039,53 @@ PokemonNode *searchPokemonBFS(PokemonNode *root, int id)
     return NULL;
 }
 
+// CASE 5:
+
+// The function sorts the list of owners Alphabetically.
+void sortOwners()
+{
+    // Check if there are less than 2 owners in the list of owners
+    if (!ownerHead || ownerHead == ownerHead->next)
+    {
+        printf("0 or 1 owners only => no need to sort.\n");
+        return;
+    }
+    int numOfOwners = 1;
+    OwnerNode *nextOwner, *currentOwner = ownerHead->next;
+    // Calculate the number of owners in the list
+    while (currentOwner != ownerHead)
+    {
+        numOfOwners++;
+        currentOwner = currentOwner->next;
+    }
+    // Commit the sorting of the list:
+    for (int i = 0; i < numOfOwners - 1; i++)
+    {
+        for (int j = 0; j < (numOfOwners - 1 - i); j++)
+        {
+            nextOwner = currentOwner->next;
+            // Compare the current owner's name with the next owner's name
+            if (strcmp(currentOwner->ownerName, nextOwner->ownerName) > 0)
+            {
+                swapOwnersData(&currentOwner, &nextOwner);
+            }
+            currentOwner = currentOwner->next;
+        }
+    }
+    printf("Owners sorted by name.\n");
+}
+
+// The function swap data between two given owners.
+void swapOwnersData(OwnerNode **firstOwner, OwnerNode **secondOwner)
+{
+    char *secondOwnerName = (*secondOwner)->ownerName;
+    PokemonNode *secondOwnerRoot = (*secondOwner)->pokedexRoot;
+    (*secondOwner)->ownerName = (*firstOwner)->ownerName;
+    (*secondOwner)->pokedexRoot = (*firstOwner)->pokedexRoot;
+    (*firstOwner)->ownerName = secondOwnerName;
+    (*firstOwner)->pokedexRoot = secondOwnerRoot;
+}
+
 // --------------------------------------------------------------
 // 1) Safe integer reading
 // --------------------------------------------------------------
@@ -1229,5 +1276,4 @@ void printPokemonNode(PokemonNode *node)
 
 // Others :
 void freeAllOwners(void) {}
-void sortOwners() {}
 void printOwnersCircular() {}

@@ -371,6 +371,9 @@ void displayMenu(OwnerNode *owner);
  */
 void sortOwners(void);
 
+// The function swap data between two given owners.
+void swapOwnersData(OwnerNode **firstOwner, OwnerNode **secondOwner);
+
 /**
  * @brief Helper to swap name & pokedexRoot in two OwnerNode.
  * @param a pointer to first owner
@@ -433,7 +436,7 @@ void deletePokedex(void);
  */
 void mergePokedexMenu(void);
 
-//
+// The function searches a pokemon by given id using BFS search.
 PokemonNode *searchPokemonBFS(PokemonNode *root, int id);
 
 /* ------------------------------------------------------------
