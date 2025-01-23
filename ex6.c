@@ -926,8 +926,6 @@ void mergePokedexMenu()
         if (strcmp(currentOwner->ownerName, secondOwnerName) == 0)
         {
             secondOwner = currentOwner;
-            // Remember the previous owner to adjust the linked list later
-            // previous = currentOwner;
         }
         currentOwner = currentOwner->next;
     } while (currentOwner != ownerHead);
@@ -1084,6 +1082,78 @@ void swapOwnersData(OwnerNode **firstOwner, OwnerNode **secondOwner)
     (*secondOwner)->pokedexRoot = (*firstOwner)->pokedexRoot;
     (*firstOwner)->ownerName = secondOwnerName;
     (*firstOwner)->pokedexRoot = secondOwnerRoot;
+}
+
+// CASE 6 :
+
+// The function prints the owners' names in Forward \ Backward order by the user's choice
+void printOwnersCircular()
+{
+    if (!ownerHead)
+    {
+        printf("No owners.\n");
+        return;
+    }
+    char direction;
+    int numOfPrints = 0;
+    printf("Enter direction (F or B): ");
+    scanf(" %s", &direction);
+    scanf("%*c");
+    OwnerNode *currentOwner = ownerHead;
+    // Check input validation and let the user enter input until a valid one is entered.
+    while (direction != 'F' && direction != 'f' && direction != 'B' && direction != 'b')
+    {
+        printf("Invalid option for direction.\n");
+        scanf(" %s", &direction);
+        scanf("%*c");
+    }
+    numOfPrints = readIntSafe("How many prints? ");
+    // If the direction chosen is F (\f), print the owners in the list in Forward order
+    if (direction == 'F' || direction == 'f')
+    {
+        for (int i = 1; i <= numOfPrints; i++)
+        {
+            printf("[%d] %s\n", i, currentOwner->ownerName);
+            currentOwner = currentOwner->next;
+        }
+        return;
+    }
+    // If the direction chosen is B (\b), print the owners in the list in Backward order
+    if (direction == 'b' || direction == 'B')
+    {
+        for (int i = 1; i <= numOfPrints; i++)
+        {
+            printf("[%d] %s\n", i, currentOwner->ownerName);
+            currentOwner = currentOwner->prev;
+        }
+    }
+}
+
+// Free All Function :
+
+// The function free all the owners in the list.
+void freeAllOwners(void)
+{
+    if (!ownerHead)
+    {
+        return;
+    }
+    OwnerNode *currentOwner = ownerHead;
+    OwnerNode *nextOwner;
+    while (currentOwner)
+    {
+        if (ownerHead == currentOwner->next)
+        {
+            nextOwner = NULL;
+        }
+        else
+        {
+            nextOwner = currentOwner->next;
+        }
+        removeOwner(currentOwner);
+        currentOwner = nextOwner;
+    }
+    ownerHead = NULL;
 }
 
 // --------------------------------------------------------------
@@ -1273,7 +1343,3 @@ void printPokemonNode(PokemonNode *node)
            node->data->attack,
            (node->data->CAN_EVOLVE == CAN_EVOLVE) ? "Yes" : "No");
 }
-
-// Others :
-void freeAllOwners(void) {}
-void printOwnersCircular() {}
