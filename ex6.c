@@ -816,6 +816,90 @@ void evolvePokemon(OwnerNode *owner)
     }
 }
 
+// CASE 3 :
+
+// The function let the user choose a pokedex to delete and deletes it
+void deletePokedex()
+{
+    // Printing the list of pokedexes
+    printf("=== Delete a Pokedex ===\n");
+    int i = 1, pokedexChoice = 0;
+    OwnerNode *currentPokedex = ownerHead;
+    while (currentPokedex)
+    {
+        printf("%d. %s\n", i, currentPokedex->ownerName);
+        if (currentPokedex->next == ownerHead)
+        {
+            break;
+        }
+        currentPokedex = currentPokedex->next;
+        i++;
+    }
+    // "Catching" the owner chosen by the user.
+    pokedexChoice = readIntSafe("Choose a Pokedex to delete by number: ");
+    currentPokedex = ownerHead;
+    OwnerNode *chosenOwner;
+    for (int i = 0; i < pokedexChoice; i++)
+    {
+        if (i + 1 == pokedexChoice)
+        {
+            chosenOwner = currentPokedex;
+            break;
+        }
+        currentPokedex = currentPokedex->next;
+    }
+    printf("\nDeleting %s's entire Pokedex...\n", chosenOwner->ownerName);
+    // Remove the chosen pokedex (owner) using a function
+    removeOwner(chosenOwner);
+    printf("Pokedex deleted.\n");
+}
+
+// The function remove the given owner from the list
+void removeOwner(OwnerNode *owner)
+{
+    if (!owner)
+    {
+        return;
+    }
+    // If there's only one owner, free it and initialize the Head to NULL since now there won't be owners
+    if (owner == owner->next)
+    {
+        freeOwnerNode(owner);
+        ownerHead = NULL;
+        return;
+    }
+    // Link between the previous and next owners of the current (-to be removed) owner
+    owner->prev->next = owner->next;
+    owner->next->prev = owner->prev;
+    // If the owner being removed is the head of the list, update the head 
+    if (ownerHead == owner)
+    {
+        ownerHead = owner->next;
+    }
+    freeOwnerNode(owner);
+}
+
+// The function free all data in a given owner and the owner itself
+void freeOwnerNode(OwnerNode *owner)
+{
+    freePokemonTree(owner->pokedexRoot);
+    // owner->pokedexRoot = NULL;
+    free(owner->ownerName);
+    free(owner);
+}
+
+// The function free all the "leaves" from the given root and the root itself
+void freePokemonTree(PokemonNode *root)
+{
+    if (!root)
+    {
+        return;
+    }
+    freePokemonTree(root->left);
+    freePokemonTree(root->right);
+    freePokemonNode(root);
+}
+
 // --------------------------------------------------------------
 // 1) Safe integer reading
 // --------------------------------------------------------------
@@ -1006,7 +1090,6 @@ void printPokemonNode(PokemonNode *node)
 
 // Others :
 void freeAllOwners(void) {}
-void deletePokedex() {}
 void mergePokedexMenu() {}
 void sortOwners() {}
 void printOwnersCircular() {}

@@ -145,6 +145,9 @@ void freePokemonTree(PokemonNode *root);
  */
 void freeOwnerNode(OwnerNode *owner);
 
+// The function remove the given owner from the list
+void removeOwner(OwnerNode *owner);
+
 /* ------------------------------------------------------------
    3) BST Insert, Search, Remove
    ------------------------------------------------------------ */
