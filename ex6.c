@@ -174,6 +174,7 @@ void createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
     if (!newPokemon)
     {
         printf("Memory allocation failed\n");
+        free(newPokemon);
         exit(1);
     }
     // Allocate memory for the PokemonData inside the new pokemon.
@@ -181,7 +182,7 @@ void createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
     if (!newPokemon->data)
     {
         printf("Memory allocation failed\n");
-        // free(newPokemon->data);
+        free(newPokemon->data);
         free(newPokemon);
         exit(1);
     }
@@ -190,7 +191,8 @@ void createPokemonNode(PokemonNode **pokemonRoot, int pokemonIndx)
     newPokemon->data->CAN_EVOLVE = pokedex[pokemonIndx].CAN_EVOLVE;
     newPokemon->data->hp = pokedex[pokemonIndx].hp;
     newPokemon->data->id = pokedex[pokemonIndx].id;
-    newPokemon->data->name = myStrdup(pokedex[pokemonIndx].name);
+    newPokemon->data->name = pokedex[pokemonIndx].name;
+    ;
     newPokemon->data->TYPE = pokedex[pokemonIndx].TYPE;
     // Set the left and right to NULL (initially no children).
     newPokemon->left = NULL;
@@ -662,7 +664,7 @@ void freePokemon(OwnerNode *owner)
     // Remove the Pokemon from the Pokedex using the removeNodeBST function
     owner->pokedexRoot = removeNodeBST(owner->pokedexRoot, pokemonIdToRelease);
     printf("Removing Pokemon %s (ID %d).\n", pokemonNameToRelease, pokemonIdToRelease);
-    free(pokemonToRelease->data->name);
+    free(pokemonNameToRelease);
 }
 
 // The function removes Pokemon by a given ID from a given pokedex root, and maintain the BST structur.
